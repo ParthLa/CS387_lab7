@@ -24,19 +24,16 @@ if __name__ == "__main__":
     # .option("mode", "PERMISSIVE").json("./newsdata")
     schema = ('date STRING, open FLOAT, high FLOAT, low FLOAT, close FLOAT, volume INT, ticker STRING')
 
-    df = SQLContext(spark).read.csv('stock_prices.csv', schema = schema)
-    df.show(2)
-    lines = df.select("date","open","close")
-    vals = lines.map(lambda row: row[2]-row[1])
+    df = SQLContext(spark).read.csv('stock_prices.csv', schema = schema, header = False)
+    # df.show(2)
+    # lines = df.select("date","open","close")
+    # sim = df.withColumn("percent", (df("close") - df("open"))*100/df("open"))
+    sim = df.withColumn("return", (df["close"] - df["open"])*100/df["open"])
+    # sim.groupBy('date').avg('return').show()
+    sim.select("date","return").groupBy("date").avg()
+    # sim=sim.select('date','return')
+    # df.groupBy(df.date).avg(df.close - df.open).show()
+    # vals = lines.map(lambda row: row[2]-row[1])
     # to take avg on key
 
-    write.csv('./stockreturns/')
-    # split each line into words
-    # lines = df.select("date_published", "article_body").rdd
-    # words = lines.flatMap(process)
-
-    # count the occurrence of each word
-    # wordCounts = words.map(lambda row: 1).reduceByKey(lambda x,y: x+ y)
-
-    # save the counts to output
-    # wordCounts.saveAsTextFile("./wordcount/")
+    sim.write.csv('./stockreturns/')

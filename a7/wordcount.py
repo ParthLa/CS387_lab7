@@ -25,6 +25,7 @@ if __name__ == "__main__":
 
     # split each line into words
     lines = df.select("date_published", "article_body").rdd
+    print(lines)
     words = lines.flatMap(process)
 
     # count the occurrence of each word
