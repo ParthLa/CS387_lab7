@@ -2,18 +2,6 @@ from pyspark.sql import SQLContext
 from pyspark import SparkContext
 import re
 # other required imports here
- 
-def process(line):
-    # fill
-    # convert all characters into lower case
-    print(line)
-    line=line.lower()
-    # replace all non-alphanumerics with whitespace
-    line=re.sub('[^0-9a-zA-Z]',' ',line)
-    # split on whitespaces
-    line=line.split(" ")
-    # return list of words
-    return line
    
 if __name__ == "__main__":
     # create Spark context with necessary configuration
@@ -30,10 +18,12 @@ if __name__ == "__main__":
     # sim = df.withColumn("percent", (df("close") - df("open"))*100/df("open"))
     sim = df.withColumn("return", (df["close"] - df["open"])*100/df["open"])
     # sim.groupBy('date').avg('return').show()
-    sim.select("date","return").groupBy("date").avg()
+    # sim.select("date","return").groupBy("date").avg()
+    x=sim.groupBy("date").avg("return")
+    x.collect()
     # sim=sim.select('date','return')
     # df.groupBy(df.date).avg(df.close - df.open).show()
     # vals = lines.map(lambda row: row[2]-row[1])
     # to take avg on key
 
-    sim.write.csv('./stockreturns/')
+    x.write.csv('./stockreturns/')
